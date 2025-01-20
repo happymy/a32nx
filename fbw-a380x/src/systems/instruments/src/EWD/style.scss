@@ -1,5 +1,6 @@
 @import "../MsfsAvionicsCommon/definitions";
 @import "../MsfsAvionicsCommon/gauges";
+@import "../MFD/pages/common/widget-style.scss"; // Re-use MFD widget style
 
 @mixin Blink10SecondsFill($color) {
     @keyframes pulsing {
@@ -478,4 +479,12 @@ text, tspan, span {
 
 .EclLineEndMarker.Last {
   border-bottom: 3px solid $display-white;
+}
+
+.EclSoftKeys {
+  position: absolute;
+  top: 965px;
+  right: 3px;
+  display: flex;
+  flex-direction: row;
 }

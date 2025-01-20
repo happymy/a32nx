@@ -4,13 +4,13 @@ import './MfdFmsFplnAirways.scss';
 import '../../common/style.scss';
 import { AbstractMfdPageProps, MfdDisplayInterface } from 'instruments/src/MFD/MFD';
 import { Footer } from 'instruments/src/MFD/pages/common/Footer';
-import { Button } from 'instruments/src/MFD/pages/common/Button';
+import { Button } from 'instruments/src/MsfsAvionicsCommon/UiWidgets/Button';
 import { FmsPage } from 'instruments/src/MFD/pages/common/FmsPage';
 import { PendingAirways } from '@fmgc/flightplanning/plans/PendingAirways';
-import { InputField } from 'instruments/src/MFD/pages/common/InputField';
+import { InputField } from 'instruments/src/MsfsAvionicsCommon/UiWidgets/InputField';
 import { AirwayFormat, WaypointFormat } from 'instruments/src/MFD/pages/common/DataEntryFormats';
 import { FmsError, FmsErrorType } from '@fmgc/FmsError';
-import { IconButton } from 'instruments/src/MFD/pages/common/IconButton';
+import { IconButton } from 'instruments/src/MsfsAvionicsCommon/UiWidgets/IconButton';
 import { NXSystemMessages } from 'instruments/src/MFD/shared/NXSystemMessages';
 import { FmcInterface } from 'instruments/src/MFD/FMC/FmcInterface';
 import { NavigationDatabaseService } from '@fmgc/flightplanning/NavigationDatabaseService';
@@ -204,20 +204,7 @@ class AirwayLine extends DisplayComponent<AirwayLineProps> {
                 return true;
               }
 
-              const fixes = await NavigationDatabaseService.activeDatabase.searchAllFix(this.props.fromFix.ident);
-              if (fixes.length === 0) {
-                this.props.fmc.showFmsErrorMessage(FmsErrorType.NotInDatabase);
-                return false;
-              }
-              let chosenFix = fixes[0];
-              if (fixes.length > 1) {
-                const dedup = await this.props.fmc.deduplicateFacilities(fixes);
-                if (dedup !== undefined) {
-                  chosenFix = dedup;
-                }
-              }
-
-              const airways = await NavigationDatabaseService.activeDatabase.searchAirway(v, chosenFix);
+              const airways = await NavigationDatabaseService.activeDatabase.searchAirway(v, this.props.fromFix);
               if (airways.length === 0) {
                 this.props.fmc.showFmsErrorMessage(FmsErrorType.NotInDatabase);
                 return false;

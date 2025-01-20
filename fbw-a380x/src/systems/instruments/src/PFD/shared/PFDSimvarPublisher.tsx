@@ -63,6 +63,7 @@ export interface PFDSimvars {
   markerBeacon: number;
   isAltManaged: boolean;
   targetSpeedManaged: number;
+  shortTermManagedSpeed: number;
   mach: number;
   flapHandleIndex: number;
   groundTrack: number;
@@ -93,6 +94,7 @@ export interface PFDSimvars {
   engFourRunning: boolean;
   expediteMode: boolean;
   setHoldSpeed: boolean;
+  tdReached: boolean;
   trkFpaDeselectedTCAS: boolean;
   tcasRaInhibited: boolean;
   groundSpeed: number;
@@ -192,7 +194,7 @@ export enum PFDVars {
   fmaSpeedProtection = 'L:A32NX_FMA_SPEED_PROTECTION_MODE',
   AThrMode = 'L:A32NX_AUTOTHRUST_MODE',
   apVsSelected = 'L:A32NX_AUTOPILOT_VS_SELECTED',
-  approachCapability = 'L:A32NX_ApproachCapability',
+  approachCapability = 'L:A32NX_APPROACH_CAPABILITY',
   ap1Active = 'L:A32NX_AUTOPILOT_1_ACTIVE',
   ap2Active = 'L:A32NX_AUTOPILOT_2_ACTIVE',
   fmaVerticalArmed = 'L:A32NX_FMA_VERTICAL_ARMED',
@@ -229,6 +231,7 @@ export enum PFDVars {
   markerBeacon = 'MARKER BEACON STATE',
   isAltManaged = 'L:A32NX_FCU_ALT_MANAGED',
   targetSpeedManaged = 'L:A32NX_SPEEDS_MANAGED_PFD',
+  shortTermManagedSpeed = 'L:A32NX_SPEEDS_MANAGED_SHORT_TERM_PFD',
   mach = 'L:A32NX_ADIRS_ADR_1_MACH',
   flapHandleIndex = 'L:A32NX_FLAPS_HANDLE_INDEX',
   groundTrack = 'L:A32NX_ADIRS_IR_1_TRACK',
@@ -258,6 +261,7 @@ export enum PFDVars {
   engFourRunning = 'GENERAL ENG COMBUSTION:4',
   expediteMode = 'L:A32NX_FMA_EXPEDITE_MODE',
   setHoldSpeed = 'L:A32NX_PFD_MSG_SET_HOLD_SPEED',
+  tdReached = 'L:A32NX_PFD_MSG_TD_REACHED',
   trkFpaDeselectedTCAS = 'L:A32NX_AUTOPILOT_TCAS_MESSAGE_TRK_FPA_DESELECTION',
   tcasRaInhibited = 'L:A32NX_AUTOPILOT_TCAS_MESSAGE_RA_INHIBITED',
   groundSpeed = 'L:A32NX_ADIRS_IR_1_GROUND_SPEED',
@@ -338,7 +342,6 @@ export class PFDSimvarPublisher extends UpdatableSimVarPublisher<PFDSimvars> {
     ['slatsFlapsStatusRaw', { name: PFDVars.slatsFlapsStatusRaw, type: SimVarValueType.Number }],
     ['slatsPositionRaw', { name: PFDVars.slatsPositionRaw, type: SimVarValueType.Number }],
     ['flapsPositionRaw', { name: PFDVars.flapsPositionRaw, type: SimVarValueType.Number }],
-    ['coldDark', { name: PFDVars.coldDark, type: SimVarValueType.Number }],
     ['elec', { name: PFDVars.elec, type: SimVarValueType.Bool }],
     ['elecFo', { name: PFDVars.elecFo, type: SimVarValueType.Bool }],
     ['potentiometerCaptain', { name: PFDVars.potentiometerCaptain, type: SimVarValueType.Number }],
@@ -396,6 +399,7 @@ export class PFDSimvarPublisher extends UpdatableSimVarPublisher<PFDSimvars> {
     ['markerBeacon', { name: PFDVars.markerBeacon, type: SimVarValueType.Enum }],
     ['isAltManaged', { name: PFDVars.isAltManaged, type: SimVarValueType.Bool }],
     ['targetSpeedManaged', { name: PFDVars.targetSpeedManaged, type: SimVarValueType.Knots }],
+    ['shortTermManagedSpeed', { name: PFDVars.shortTermManagedSpeed, type: SimVarValueType.Number }],
     ['mach', { name: PFDVars.mach, type: SimVarValueType.Number }],
     ['flapHandleIndex', { name: PFDVars.flapHandleIndex, type: SimVarValueType.Number }],
     ['groundTrack', { name: PFDVars.groundTrack, type: SimVarValueType.Number }],
@@ -419,8 +423,11 @@ export class PFDSimvarPublisher extends UpdatableSimVarPublisher<PFDSimvars> {
     ['tcasFail', { name: PFDVars.tcasFail, type: SimVarValueType.Bool }],
     ['engOneRunning', { name: PFDVars.engOneRunning, type: SimVarValueType.Bool }],
     ['engTwoRunning', { name: PFDVars.engTwoRunning, type: SimVarValueType.Bool }],
+    ['engThreeRunning', { name: PFDVars.engThreeRunning, type: SimVarValueType.Bool }],
+    ['engFourRunning', { name: PFDVars.engFourRunning, type: SimVarValueType.Bool }],
     ['expediteMode', { name: PFDVars.expediteMode, type: SimVarValueType.Bool }],
     ['setHoldSpeed', { name: PFDVars.setHoldSpeed, type: SimVarValueType.Bool }],
+    ['tdReached', { name: PFDVars.tdReached, type: SimVarValueType.Bool }],
     ['trkFpaDeselectedTCAS', { name: PFDVars.trkFpaDeselectedTCAS, type: SimVarValueType.Bool }],
     ['tcasRaInhibited', { name: PFDVars.tcasRaInhibited, type: SimVarValueType.Bool }],
     ['groundSpeed', { name: PFDVars.groundSpeed, type: SimVarValueType.Number }],

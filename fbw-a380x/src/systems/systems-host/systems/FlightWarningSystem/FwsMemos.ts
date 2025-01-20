@@ -3,8 +3,9 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import { EcamMemos } from '../../../instruments/src/MsfsAvionicsCommon/EcamMessages';
-import { MappedSubject, Subject, Subscribable, SubscribableMapFunctions } from '@microsoft/msfs-sdk';
+import { MappedSubject, Subscribable, SubscribableMapFunctions } from '@microsoft/msfs-sdk';
 import { FwsCore } from 'systems-host/systems/FlightWarningSystem/FwsCore';
+import { SdPages } from '@shared/EcamSystemPages';
 
 interface EwdMemoItem {
   flightPhaseInhib: number[];
@@ -14,7 +15,7 @@ interface EwdMemoItem {
   codesToReturn: string[];
   memoInhibit: () => boolean;
   failure: number;
-  sysPage: number;
+  sysPage: SdPages;
   side: string;
 }
 
@@ -34,7 +35,7 @@ export class FwsMemos {
       codesToReturn: ['000005001'],
       memoInhibit: () => this.fws.toMemo.get() === 1 || this.fws.ldgMemo.get() === 1,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     271000001: {
@@ -45,23 +46,7 @@ export class FwsMemos {
       codesToReturn: ['271000001'],
       memoInhibit: () => this.fws.toMemo.get() === 1 || this.fws.ldgMemo.get() === 1,
       failure: 0,
-      sysPage: -1,
-      side: 'RIGHT',
-    },
-
-    '0000105': {
-      // OUTR TK FUEL XFRD
-      flightPhaseInhib: [], // Plus check that outer tanks not empty
-      simVarIsActive: MappedSubject.create(
-        ([leftOuterInnerValve, rightOuterInnerValve]) => !!leftOuterInnerValve || !!rightOuterInnerValve,
-        this.fws.leftOuterInnerValve,
-        this.fws.rightOuterInnerValve,
-      ),
-      whichCodeToReturn: () => [0],
-      codesToReturn: ['000010501'], // config memo
-      memoInhibit: () => this.fws.toMemo.get() === 1 || this.fws.ldgMemo.get() === 1,
-      failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '0000060': {
@@ -70,13 +55,35 @@ export class FwsMemos {
       simVarIsActive: MappedSubject.create(
         ([speedBrakeCommand, fwcFlightPhase]) => speedBrakeCommand && ![1, 8, 9, 10].includes(fwcFlightPhase),
         this.fws.speedBrakeCommand,
-        this.fws.fwcFlightPhase,
+        this.fws.flightPhase,
       ),
       whichCodeToReturn: () => [this.fws.amberSpeedBrake.get() ? 1 : 0],
       codesToReturn: ['000006001', '000006002'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
+      side: 'RIGHT',
+    },
+    '280000001': {
+      // CROSSFEED OPEN
+      flightPhaseInhib: [3, 4, 5, 6, 7],
+      simVarIsActive: this.fws.crossFeedOpenMemo,
+      whichCodeToReturn: () => [0],
+      codesToReturn: ['280000001'],
+      memoInhibit: () => false,
+      failure: 0,
+      sysPage: SdPages.None,
+      side: 'RIGHT',
+    },
+    '280000013': {
+      // CROSSFEED OPEN during TO or GA
+      flightPhaseInhib: [1, 2, 8, 9, 10, 11, 12],
+      simVarIsActive: this.fws.crossFeedOpenMemo,
+      whichCodeToReturn: () => [0],
+      codesToReturn: ['280000013'],
+      memoInhibit: () => false,
+      failure: 0,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '300000001': {
@@ -93,7 +100,7 @@ export class FwsMemos {
       codesToReturn: ['300000001'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '300000002': {
@@ -104,7 +111,7 @@ export class FwsMemos {
       codesToReturn: ['300000002'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '300000003': {
@@ -119,7 +126,7 @@ export class FwsMemos {
       codesToReturn: ['300000003'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '0000170': {
@@ -134,7 +141,7 @@ export class FwsMemos {
       codesToReturn: ['000017001'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '0000180': {
@@ -149,23 +156,7 @@ export class FwsMemos {
       codesToReturn: ['000018001'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
-      side: 'RIGHT',
-    },
-    '0000190': {
-      // LDG LT
-      flightPhaseInhib: [],
-      simVarIsActive: MappedSubject.create(
-        ([leftLandingLightExtended, rightLandingLightExtended]) =>
-          leftLandingLightExtended || rightLandingLightExtended,
-        this.fws.leftLandingLightExtended,
-        this.fws.rightlandingLightExtended,
-      ),
-      whichCodeToReturn: () => [0],
-      codesToReturn: ['000019001'],
-      memoInhibit: () => false,
-      failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '0000290': {
@@ -176,7 +167,7 @@ export class FwsMemos {
       codesToReturn: ['000029001'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '0000230': {
@@ -187,18 +178,7 @@ export class FwsMemos {
       codesToReturn: ['000023001'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
-      side: 'RIGHT',
-    },
-    '0000250': {
-      // FUEL X FEED
-      flightPhaseInhib: [],
-      simVarIsActive: this.fws.fuelXFeedPBOn,
-      whichCodeToReturn: () => [[3, 4, 5].includes(this.fws.fwcFlightPhase.get()) ? 1 : 0],
-      codesToReturn: ['000025001', '000025002'],
-      memoInhibit: () => false,
-      failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '230000001': {
@@ -214,7 +194,30 @@ export class FwsMemos {
       codesToReturn: ['230000001'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
+      side: 'RIGHT',
+    },
+    // 22 - Flight guidance
+    220000001: {
+      // A/THR OFF
+      flightPhaseInhib: [],
+      simVarIsActive: this.fws.autoPilotOffShowMemo,
+      whichCodeToReturn: () => [0],
+      codesToReturn: ['220000001'],
+      memoInhibit: () => false,
+      failure: 0,
+      sysPage: SdPages.None,
+      side: 'RIGHT',
+    },
+    220000002: {
+      // A/THR OFF
+      flightPhaseInhib: [],
+      simVarIsActive: this.fws.autoThrustOffVoluntary,
+      whichCodeToReturn: () => [0],
+      codesToReturn: ['220000002'],
+      memoInhibit: () => false,
+      failure: 0,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '230000002': {
@@ -230,7 +233,7 @@ export class FwsMemos {
       codesToReturn: ['230000002'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '230000003': {
@@ -246,7 +249,7 @@ export class FwsMemos {
       codesToReturn: ['230000003'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '230000009': {
@@ -262,7 +265,7 @@ export class FwsMemos {
       codesToReturn: ['230000009'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '230000010': {
@@ -278,7 +281,7 @@ export class FwsMemos {
       codesToReturn: ['230000010'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '230000011': {
@@ -294,7 +297,7 @@ export class FwsMemos {
       codesToReturn: ['230000011'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '230000012': {
@@ -310,7 +313,7 @@ export class FwsMemos {
       codesToReturn: ['230000012'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '230000015': {
@@ -321,7 +324,7 @@ export class FwsMemos {
       codesToReturn: ['230000015'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
 
@@ -343,18 +346,18 @@ export class FwsMemos {
       codesToReturn: ['241000001', '241000002'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '242000001': {
       // RAT OUT
       flightPhaseInhib: [],
       simVarIsActive: this.fws.ratDeployed.map((v) => v > 0),
-      whichCodeToReturn: () => [[1, 2].includes(this.fws.fwcFlightPhase.get()) ? 0 : 1],
+      whichCodeToReturn: () => [[1, 2].includes(this.fws.flightPhase.get()) ? 0 : 1],
       codesToReturn: ['242000001', '242000002'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     // ATA 29
@@ -366,7 +369,7 @@ export class FwsMemos {
       codesToReturn: ['290000001'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '290000002': {
@@ -377,7 +380,7 @@ export class FwsMemos {
       codesToReturn: ['290000002'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '290000003': {
@@ -388,7 +391,7 @@ export class FwsMemos {
       codesToReturn: ['290000003'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '290000004': {
@@ -399,7 +402,7 @@ export class FwsMemos {
       codesToReturn: ['290000004'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     // 31 INDICATING RECORDING
@@ -411,7 +414,7 @@ export class FwsMemos {
       codesToReturn: ['314000001'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     314000002: {
@@ -422,19 +425,19 @@ export class FwsMemos {
       codesToReturn: ['314000002'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     // 32 LANDING GEAR
     320000001: {
       // AUTO BRK OFF
       flightPhaseInhib: [1, 2, 3, 4, 5, 6, 7, 8, 9, 12],
-      simVarIsActive: Subject.create(false),
+      simVarIsActive: this.fws.autoBrakeOff,
       whichCodeToReturn: () => [0],
       codesToReturn: ['320000001'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     // ATA 32
@@ -455,7 +458,7 @@ export class FwsMemos {
       codesToReturn: ['322000001', '322000002'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '320000002': {
@@ -466,7 +469,7 @@ export class FwsMemos {
       codesToReturn: ['320000002'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '333000001': {
@@ -481,7 +484,7 @@ export class FwsMemos {
       codesToReturn: ['333000001'],
       memoInhibit: () => this.fws.toMemo.get() === 1 || this.fws.ldgMemo.get() === 1,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '335000001': {
@@ -492,18 +495,18 @@ export class FwsMemos {
       codesToReturn: ['335000001'],
       memoInhibit: () => this.fws.toMemo.get() === 1 || this.fws.ldgMemo.get() === 1,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '335000003': {
       // NO MOBILE
-      flightPhaseInhib: [2, 9, 10],
+      flightPhaseInhib: [],
       simVarIsActive: this.fws.noMobileSwitchPosition.map((pos) => pos === 0),
       whichCodeToReturn: () => [0],
       codesToReturn: ['335000003'],
-      memoInhibit: () => this.fws.toMemo.get() === 1 || this.fws.ldgMemo.get() === 1,
+      memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '340000001': {
@@ -514,23 +517,22 @@ export class FwsMemos {
       codesToReturn: ['340000001'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '340003001': {
       // IR IN ALIGN
       flightPhaseInhib: [3, 4, 5, 6, 7, 8, 9, 10],
       simVarIsActive: MappedSubject.create(
-        ([adirsRemainingAlignTime, adiru1State, adiru2State, adiru3State]) => {
+        ([adirsRemainingAlignTime, ir1Align, ir2Align, ir3Align]) => {
           const remainingTimeAbove240 = adirsRemainingAlignTime >= 240;
-          const allInState1 = adiru1State === 1 && adiru2State === 1 && adiru3State === 1;
-
-          return remainingTimeAbove240 && allInState1;
+          const allInAlign = ir1Align && ir2Align && ir3Align;
+          return remainingTimeAbove240 && allInAlign;
         },
         this.fws.adirsRemainingAlignTime,
-        this.fws.adiru1State,
-        this.fws.adiru2State,
-        this.fws.adiru3State,
+        this.fws.ir1Align,
+        this.fws.ir2Align,
+        this.fws.ir3Align,
       ),
       whichCodeToReturn: () => [
         this.fws.adirsMessage1(
@@ -553,24 +555,23 @@ export class FwsMemos {
       ],
       memoInhibit: () => this.fws.toMemo.get() === 1 || this.fws.ldgMemo.get() === 1,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '340003101': {
       // IR IN ALIGN
       flightPhaseInhib: [3, 4, 5, 6, 7, 8, 9, 10],
       simVarIsActive: MappedSubject.create(
-        ([adirsRemainingAlignTime, adiru1State, adiru2State, adiru3State]) => {
+        ([adirsRemainingAlignTime, ir1Align, ir2Align, ir3Align]) => {
           const remainingTimeAbove0 = adirsRemainingAlignTime > 0;
           const remainingTimeBelow240 = adirsRemainingAlignTime < 240;
-          const allInState1 = adiru1State === 1 && adiru2State === 1 && adiru3State === 1;
-
-          return remainingTimeAbove0 && remainingTimeBelow240 && allInState1;
+          const allInAlign = ir1Align && ir2Align && ir3Align;
+          return remainingTimeAbove0 && remainingTimeBelow240 && allInAlign;
         },
         this.fws.adirsRemainingAlignTime,
-        this.fws.adiru1State,
-        this.fws.adiru2State,
-        this.fws.adiru3State,
+        this.fws.ir1Align,
+        this.fws.ir2Align,
+        this.fws.ir3Align,
       ),
       whichCodeToReturn: () => [
         this.fws.adirsMessage2(
@@ -593,7 +594,7 @@ export class FwsMemos {
       ],
       memoInhibit: () => this.fws.toMemo.get() === 1 || this.fws.ldgMemo.get() === 1,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '340068001': {
@@ -608,7 +609,7 @@ export class FwsMemos {
       codesToReturn: ['340068001'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
 
@@ -620,7 +621,7 @@ export class FwsMemos {
       codesToReturn: ['341000001'],
       memoInhibit: () => this.fws.toMemo.get() === 1 || this.fws.ldgMemo.get() === 1,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '341000002': {
@@ -631,7 +632,7 @@ export class FwsMemos {
       codesToReturn: ['341000002'],
       memoInhibit: () => this.fws.toMemo.get() === 1 || this.fws.ldgMemo.get() === 1,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '341000003': {
@@ -642,19 +643,19 @@ export class FwsMemos {
       codesToReturn: ['341000003'],
       memoInhibit: () => this.fws.toMemo.get() === 1 || this.fws.ldgMemo.get() === 1,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
 
     '343000001': {
       // TCAS STBY
       flightPhaseInhib: [1, 12],
-      simVarIsActive: MappedSubject.create(([tcasSensitivity]) => tcasSensitivity === 1, this.fws.tcasSensitivity),
+      simVarIsActive: this.fws.tcasStandbyMemo,
       whichCodeToReturn: () => [0],
       codesToReturn: ['343000001'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '343000002': {
@@ -665,7 +666,7 @@ export class FwsMemos {
       codesToReturn: ['343000002'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '343000003': {
@@ -676,7 +677,7 @@ export class FwsMemos {
       codesToReturn: ['343000003'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '350000001': {
@@ -684,10 +685,12 @@ export class FwsMemos {
       flightPhaseInhib: [],
       simVarIsActive: this.fws.paxOxyMasksDeployed,
       whichCodeToReturn: () => [0],
-      codesToReturn: [!this.fws.aircraftOnGround.get() && this.fws.excessPressure.get() ? '350000001' : '350000002'],
+      codesToReturn: [
+        !this.fws.aircraftOnGround.get() && this.fws.excessCabinAltitude.get() ? '350000001' : '350000002',
+      ],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '460000001': {
@@ -698,7 +701,7 @@ export class FwsMemos {
       codesToReturn: ['460000001'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
     '709000001': {
@@ -709,7 +712,7 @@ export class FwsMemos {
       codesToReturn: ['709000001'],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'RIGHT',
     },
   };
@@ -748,7 +751,7 @@ export class FwsMemos {
       ],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'LEFT',
     },
     '0000020': {
@@ -783,7 +786,7 @@ export class FwsMemos {
       ],
       memoInhibit: () => false,
       failure: 0,
-      sysPage: -1,
+      sysPage: SdPages.None,
       side: 'LEFT',
     },
   };
@@ -1008,7 +1011,7 @@ export class FwsMemos {
       codeToReturn: ['270005201'],
       memoInhibit: () => false,
       failure: 3,
-      sysPage: -1,
+      sysPage: SdPages.None,
     },
     2700110: {
       // ELAC 1 FAULT
@@ -1179,7 +1182,7 @@ export class FwsMemos {
       codeToReturn: ['270050201'],
       memoInhibit: () => false,
       failure: 2,
-      sysPage: -1,
+      sysPage: SdPages.None,
     },
     2700555: {
       // FCDC 1 FAULT
@@ -1189,7 +1192,7 @@ export class FwsMemos {
       codeToReturn: ['270055501'],
       memoInhibit: () => false,
       failure: 1,
-      sysPage: -1,
+      sysPage: SdPages.None,
     },
     2700557: {
       // FCDC 2 FAULT
@@ -1199,7 +1202,7 @@ export class FwsMemos {
       codeToReturn: ['270055701'],
       memoInhibit: () => false,
       failure: 1,
-      sysPage: -1,
+      sysPage: SdPages.None,
     },
     2700870: {
       // GND SPLR NOT ARMED
@@ -1209,7 +1212,7 @@ export class FwsMemos {
       codeToReturn: ['270087001'],
       memoInhibit: () => false,
       failure: 2,
-      sysPage: -1,
+      sysPage: SdPages.None,
     },
     2131221: {
       // EXCESS CAB ALT
@@ -1450,7 +1453,7 @@ export class FwsMemos {
       codeToReturn: ['216129101'],
       memoInhibit: () => false,
       failure: 1,
-      sysPage: -1,
+      sysPage: SdPages.None,
     },
     2161297: {
       // COND CTL 1-B FAULT
@@ -1464,7 +1467,7 @@ export class FwsMemos {
       codeToReturn: ['216129701'],
       memoInhibit: () => false,
       failure: 1,
-      sysPage: -1,
+      sysPage: SdPages.None,
     },
     2161294: {
       // COND CTL 2-A FAULT
@@ -1478,7 +1481,7 @@ export class FwsMemos {
       codeToReturn: ['216129401'],
       memoInhibit: () => false,
       failure: 1,
-      sysPage: -1,
+      sysPage: SdPages.None,
     },
     2161298: {
       // COND CTL 2-B FAULT
@@ -1492,7 +1495,7 @@ export class FwsMemos {
       codeToReturn: ['216129801'],
       memoInhibit: () => false,
       failure: 1,
-      sysPage: -1,
+      sysPage: SdPages.None,
     },
     2163210: {
       // CKPT DUCT OVHT
@@ -1546,7 +1549,7 @@ export class FwsMemos {
       codeToReturn: ['216326001'],
       memoInhibit: () => false,
       failure: 1,
-      sysPage: -1,
+      sysPage: SdPages.None,
     },
     2163290: {
       // HOT AIR FAULT
@@ -1578,7 +1581,7 @@ export class FwsMemos {
       codeToReturn: ['216330501', '216330502', '216330503', '216330504', '216330505'],
       memoInhibit: () => false,
       failure: 1,
-      sysPage: -1,
+      sysPage: SdPages.None,
     },
     2600150: {
       // SMOKE FWD CARGO SMOKE
@@ -1608,7 +1611,7 @@ export class FwsMemos {
       ],
       memoInhibit: () => false,
       failure: 3,
-      sysPage: -1,
+      sysPage: SdPages.None,
     },
     7700647: {
       // THR LEVERS NOT SET  (on ground)
@@ -1628,7 +1631,7 @@ export class FwsMemos {
       codeToReturn: ['770064701', '770064702', '770064703'],
       memoInhibit: () => false,
       failure: 2,
-      sysPage: -1,
+      sysPage: SdPages.None,
     },
     3200050: {
       // PK BRK ON
@@ -1643,7 +1646,7 @@ export class FwsMemos {
       codeToReturn: ['320005001'],
       memoInhibit: () => false,
       failure: 3,
-      sysPage: -1,
+      sysPage: SdPages.None,
     },
     3200060: {
       // NW ANTI SKID INACTIVE
@@ -1663,7 +1666,7 @@ export class FwsMemos {
       codeToReturn: ['320015001'],
       memoInhibit: () => false,
       failure: 3,
-      sysPage: -1,
+      sysPage: SdPages.None,
       cancel: false,
     },
     3200155: {
@@ -1678,7 +1681,7 @@ export class FwsMemos {
       codeToReturn: ['320015501'],
       memoInhibit: () => false,
       failure: 3,
-      sysPage: -1,
+      sysPage: SdPages.None,
       cancel: true,
     },
     3200180: {
@@ -1695,7 +1698,7 @@ export class FwsMemos {
       codeToReturn: ['320018001', '320018002'],
       memoInhibit: () => false,
       failure: 1,
-      sysPage: -1,
+      sysPage: SdPages.None,
     },
     3200190: {
       // LGCIU 2 FAULT
@@ -1710,7 +1713,7 @@ export class FwsMemos {
       codeToReturn: ['320019001'],
       memoInhibit: () => false,
       failure: 1,
-      sysPage: -1,
+      sysPage: SdPages.None,
     },
     3200195: {
       // LGCIU 1+2 FAULT
@@ -1741,7 +1744,7 @@ export class FwsMemos {
       codeToReturn: ['340014001'],
       memoInhibit: () => false,
       failure: 2,
-      sysPage: -1,
+      sysPage: SdPages.None,
     },
     3400150: {
       // RA 2 FAULT
@@ -1755,7 +1758,7 @@ export class FwsMemos {
       codeToReturn: ['340015001'],
       memoInhibit: () => false,
       failure: 2,
-      sysPage: -1,
+      sysPage: SdPages.None,
     },
     3400500: {
       // TCAS FAULT
@@ -1765,7 +1768,7 @@ export class FwsMemos {
       codeToReturn: ['340050001'],
       memoInhibit: () => false,
       failure: 2,
-      sysPage: -1,
+      sysPage: SdPages.None,
     },
     3400507: {
       // NAV TCAS STBY (in flight)
@@ -1775,7 +1778,7 @@ export class FwsMemos {
       codeToReturn: ['340050701'],
       memoInhibit: () => false,
       failure: 2,
-      sysPage: -1,
+      sysPage: SdPages.None,
     },
     3200010: {
       // L/G-BRAKES OVHT
@@ -1820,7 +1823,7 @@ export class FwsMemos {
       codeToReturn: ['308128001', '308128002', '308128003'],
       memoInhibit: () => false,
       failure: 2,
-      sysPage: -1,
+      sysPage: SdPages.None,
     },
     3081280: {
       // ICE DETECTED
@@ -1830,7 +1833,7 @@ export class FwsMemos {
       codeToReturn: ['308128001', '308128002', '308128003'],
       memoInhibit: () => false,
       failure: 2,
-      sysPage: -1,
+      sysPage: SdPages.None,
     },
     2900126: {
       // *HYD  - Blue reservoir overheat

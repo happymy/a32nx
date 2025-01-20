@@ -4,6 +4,7 @@
 
 import {
   Clock,
+  ConsumerSubject,
   FsBaseInstrument,
   FSComponent,
   FsInstrument,
@@ -16,27 +17,26 @@ import {
 import {
   A380EfisNdRangeValue,
   a380EfisRangeSettings,
+  a380TerrainThresholdPadValue,
   ArincEventBus,
+  BtvSimvarPublisher,
   EfisNdMode,
   EfisSide,
+  FcuBusPublisher,
+  FcuSimVars,
+  FmsOansSimvarPublisher,
 } from '@flybywiresim/fbw-sdk';
 import { NDComponent } from '@flybywiresim/navigation-display';
 import {
   a380EfisZoomRangeSettings,
   A380EfisZoomRangeValue,
-  BtvArincProvider,
-  BtvSimvarPublisher,
-  FmsOansArincProvider,
-  FmsOansSimvarPublisher,
   Oanc,
-  OANC_RENDER_HEIGHT,
-  OANC_RENDER_WIDTH,
   OansControlEvents,
   ZOOM_TRANSITION_TIME_MS,
 } from '@flybywiresim/oanc';
 
-import { ContextMenu, ContextMenuElement } from 'instruments/src/MFD/pages/common/ContextMenu';
-import { MouseCursor } from 'instruments/src/MFD/pages/common/MouseCursor';
+import { ContextMenu, ContextMenuElement } from 'instruments/src/MsfsAvionicsCommon/UiWidgets/ContextMenu';
+import { MouseCursor } from 'instruments/src/MsfsAvionicsCommon/UiWidgets/MouseCursor';
 import { OansControlPanel } from './OansControlPanel';
 import { FmsSymbolsPublisher } from './FmsSymbolsPublisher';
 import { NDSimvarPublisher, NDSimvars } from './NDSimvarPublisher';
@@ -50,7 +50,6 @@ import { CdsDisplayUnit, DisplayUnitID, getDisplayIndex } from '../MsfsAvionicsC
 import { EgpwcBusPublisher } from '../MsfsAvionicsCommon/providers/EgpwcBusPublisher';
 import { DmcPublisher } from '../MsfsAvionicsCommon/providers/DmcPublisher';
 import { FMBusPublisher } from '../MsfsAvionicsCommon/providers/FMBusPublisher';
-import { FcuBusPublisher, FcuSimVars } from '../MsfsAvionicsCommon/providers/FcuBusPublisher';
 import { RopRowOansPublisher } from '@flybywiresim/msfs-avionics-common';
 import { SimplaneValueProvider } from 'instruments/src/MsfsAvionicsCommon/providers/SimplaneValueProvider';
 
@@ -80,13 +79,9 @@ class NDInstrument implements FsInstrument {
 
   private readonly fmsOansSimvarPublisher: FmsOansSimvarPublisher;
 
-  private readonly fmsOansArincProvider: FmsOansArincProvider;
-
   private readonly ropRowOansPublisher: RopRowOansPublisher;
 
   private readonly btvSimvarPublisher: BtvSimvarPublisher;
-
-  private readonly btvArincProvider: BtvArincProvider;
 
   private readonly fgDataPublisher: FGDataPublisher;
 
@@ -119,8 +114,6 @@ class NDInstrument implements FsInstrument {
   private readonly contextMenuY = Subject.create(0);
 
   private readonly controlPanelVisible = Subject.create(false);
-
-  private readonly oansMessageScreenRef = FSComponent.createRef<HTMLDivElement>();
 
   private oansContextMenuItems: Subscribable<ContextMenuElement[]> = Subject.create([
     {
@@ -189,11 +182,11 @@ class NDInstrument implements FsInstrument {
 
   private oansRef = FSComponent.createRef<Oanc<A380EfisZoomRangeValue>>();
 
-  private oansContainerRef = FSComponent.createRef<HTMLDivElement>();
-
-  private oansControlPanelContainerRef = FSComponent.createRef<HTMLDivElement>();
-
   private cursorVisible = Subject.create<boolean>(true);
+
+  private readonly oansNotAvailable = ConsumerSubject.create(null, true);
+
+  private readonly oansShown = Subject.create(false);
 
   constructor() {
     const side: EfisSide = getDisplayIndex() === 1 ? 'L' : 'R';
@@ -206,10 +199,8 @@ class NDInstrument implements FsInstrument {
     this.fcuBusPublisher = new FcuBusPublisher(this.bus, side);
     this.fmsDataPublisher = new FmsDataPublisher(this.bus, stateSubject);
     this.fmsOansSimvarPublisher = new FmsOansSimvarPublisher(this.bus);
-    this.fmsOansArincProvider = new FmsOansArincProvider(this.bus);
     this.ropRowOansPublisher = new RopRowOansPublisher(this.bus);
     this.btvSimvarPublisher = new BtvSimvarPublisher(this.bus);
-    this.btvArincProvider = new BtvArincProvider(this.bus);
     this.fgDataPublisher = new FGDataPublisher(this.bus);
     this.fmBusPublisher = new FMBusPublisher(this.bus);
     this.fmsSymbolsPublisher = new FmsSymbolsPublisher(this.bus, side);
@@ -239,8 +230,6 @@ class NDInstrument implements FsInstrument {
     this.backplane.addPublisher('egpwc', this.egpwcBusPublisher);
     this.backplane.addPublisher('hEvent', this.hEventPublisher);
 
-    this.backplane.addInstrument('btvArinc', this.btvArincProvider);
-    this.backplane.addInstrument('fms-arinc', this.fmsOansArincProvider);
     this.backplane.addInstrument('Simplane', this.simplaneValueProvider);
     this.backplane.addInstrument('clock', this.clock);
 
@@ -256,37 +245,59 @@ class NDInstrument implements FsInstrument {
       <div ref={this.topRef}>
         <CdsDisplayUnit
           bus={this.bus}
-          displayUnitId={DisplayUnitID.CaptNd}
+          displayUnitId={getDisplayIndex() === 1 ? DisplayUnitID.CaptNd : DisplayUnitID.FoNd}
           test={Subject.create(-1)}
           failed={Subject.create(false)}
         >
           <div
-            ref={this.oansContainerRef}
             class="oanc-container"
-            style={`width: ${OANC_RENDER_WIDTH}px; height: ${OANC_RENDER_HEIGHT}px; overflow: hidden`}
+            style={{
+              display: this.oansShown.map((v) => (v ? 'block' : 'none')),
+            }}
           >
-            <div ref={this.oansMessageScreenRef} class="oanc-message-screen" style="visibility: hidden;">
-              PLEASE WAIT
+            {/* This flag is rendered by the CDS so it lives here instead of in the OANC */}
+            <div
+              class="oanc-flag-container amber FontLarge"
+              style={{
+                visibility: this.oansNotAvailable.map((v) => (v ? 'inherit' : 'hidden')),
+              }}
+            >
+              NOT AVAIL
             </div>
-            <Oanc
-              bus={this.bus}
-              side={this.efisSide}
-              ref={this.oansRef}
-              messageScreenRef={this.oansMessageScreenRef}
-              contextMenuVisible={this.contextMenuVisible}
-              contextMenuX={this.contextMenuX}
-              contextMenuY={this.contextMenuY}
-              zoomValues={a380EfisZoomRangeSettings}
-            />
+
+            <div
+              style={{
+                display: this.oansNotAvailable.map((v) => (v ? 'none' : 'block')),
+              }}
+            >
+              <Oanc
+                bus={this.bus}
+                side={this.efisSide}
+                ref={this.oansRef}
+                contextMenuVisible={this.contextMenuVisible}
+                contextMenuX={this.contextMenuX}
+                contextMenuY={this.contextMenuY}
+                zoomValues={a380EfisZoomRangeSettings}
+              />
+            </div>
           </div>
-          <NDComponent bus={this.bus} side={this.efisSide} rangeValues={a380EfisRangeSettings} />
+          <NDComponent
+            bus={this.bus}
+            side={this.efisSide}
+            rangeValues={a380EfisRangeSettings}
+            terrainThresholdPaddingText={a380TerrainThresholdPadValue}
+          />
           <ContextMenu
             ref={this.contextMenuRef}
             opened={this.contextMenuOpened}
             idPrefix="contextMenu"
             values={this.oansContextMenuItems}
           />
-          <div ref={this.oansControlPanelContainerRef}>
+          <div
+            style={{
+              display: this.oansShown.map((v) => (v ? 'block' : 'none')),
+            }}
+          >
             <OansControlPanel
               ref={this.controlPanelRef}
               bus={this.bus}
@@ -337,6 +348,8 @@ class NDInstrument implements FsInstrument {
 
     const sub = this.bus.getSubscriber<FcuSimVars & OansControlEvents>();
 
+    this.oansNotAvailable.setConsumer(sub.on('oansNotAvail'));
+
     sub
       .on('ndMode')
       .whenChanged()
@@ -355,16 +368,12 @@ class NDInstrument implements FsInstrument {
   }
 
   private updateNdOansVisibility() {
-    if (this.oansContainerRef.getOrDefault()) {
-      if (this.efisCpRange === -1 && [EfisNdMode.PLAN, EfisNdMode.ARC, EfisNdMode.ROSE_NAV].includes(this.efisNdMode)) {
-        this.bus.getPublisher<OansControlEvents>().pub('ndShowOans', true);
-        this.oansContainerRef.instance.style.display = 'block';
-        this.oansControlPanelContainerRef.instance.style.display = 'block';
-      } else {
-        this.bus.getPublisher<OansControlEvents>().pub('ndShowOans', false);
-        this.oansContainerRef.instance.style.display = 'none';
-        this.oansControlPanelContainerRef.instance.style.display = 'none';
-      }
+    if (this.efisCpRange === -1 && [EfisNdMode.PLAN, EfisNdMode.ARC, EfisNdMode.ROSE_NAV].includes(this.efisNdMode)) {
+      this.bus.getPublisher<OansControlEvents>().pub('ndShowOans', true);
+      this.oansShown.set(true);
+    } else {
+      this.bus.getPublisher<OansControlEvents>().pub('ndShowOans', false);
+      this.oansShown.set(false);
     }
   }
 

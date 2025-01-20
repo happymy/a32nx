@@ -18,7 +18,6 @@ import { AbnormalProcedure, ChecklistLineStyle } from 'instruments/src/MsfsAvion
 /** All abnormal sensed procedures (alerts, via ECL) should be here. */
 export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
   // ATA 21: AC
-  // TODO: items is not done yet for most abnormal procedures
   211800001: {
     title: '\x1b<4m\x1b4mAIR\x1bm PACK 1 CTL 1 FAULT',
     sensed: true,
@@ -45,17 +44,17 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
     items: [],
   },
   211800006: {
-    title: '\x1b<4m\x1b4mAIR\x1bm PACK 2 CTL DEGRADED  ',
+    title: '\x1b<4m\x1b4mAIR\x1bm PACK 2 CTL DEGRADED',
     sensed: true,
     items: [],
   },
   211800007: {
-    title: '\x1b<4m\x1b4mAIR\x1bm PACK 1 CTL REDUNDANCY LOST  ',
+    title: '\x1b<4m\x1b4mAIR\x1bm PACK 1 CTL REDUNDANCY LOST',
     sensed: true,
     items: [],
   },
   211800008: {
-    title: '\x1b<4m\x1b4mAIR\x1bm PACK 2 CTL REDUNDANCY LOST ',
+    title: '\x1b<4m\x1b4mAIR\x1bm PACK 2 CTL REDUNDANCY LOST',
     sensed: true,
     items: [],
   },
@@ -63,6 +62,11 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
     title: '\x1b<4m\x1b4mAIR\x1bm PACK 1 FAULT',
     sensed: true,
     items: [
+      {
+        name: 'PACK 1 CTL 1+2 FAULT',
+        sensed: true,
+        style: ChecklistLineStyle.Amber,
+      },
       {
         name: 'PACK 1',
         sensed: true,
@@ -75,6 +79,11 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
     sensed: true,
     items: [
       {
+        name: 'PACK 2 CTL 1+2 FAULT',
+        sensed: true,
+        style: ChecklistLineStyle.Amber,
+      },
+      {
         name: 'PACK 2',
         sensed: true,
         labelNotCompleted: 'OFF',
@@ -82,7 +91,7 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
     ],
   },
   211800011: {
-    title: '\x1b<4m\x1b4mAIR\x1bm PACK 1 OFF ',
+    title: '\x1b<4m\x1b4mAIR\x1bm PACK 1 OFF',
     sensed: true,
     items: [],
   },
@@ -191,7 +200,7 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
     items: [],
   },
   211800021: {
-    title: '\x1b<4m\x1b4mAIR\x1bm PACK 1+2 FAULT  ',
+    title: '\x1b<4m\x1b4mAIR\x1bm PACK 1+2 FAULT',
     sensed: true,
     // If at least one door is not closed or is not locked, and at least one engine is running:
     items: [
@@ -201,7 +210,8 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
       },
       {
         name: 'MAX FL : 100/MEA',
-        sensed: false,
+        sensed: true,
+        style: ChecklistLineStyle.Cyan,
       },
       //Otherwise
       {
@@ -217,7 +227,8 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
       // If there is pack overheat
       {
         name: 'IF PACK OVHT OUT',
-        sensed: false,
+        sensed: true,
+        style: ChecklistLineStyle.Headline,
         level: 1,
       },
       {
@@ -234,14 +245,21 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
       },
       // In flight, if above FL 100
       {
-        name: 'DESCENT TO FL 100/MEA',
+        name: 'DESCENT TO FL 100/MEA-MORA',
         sensed: false,
         labelNotCompleted: 'INITIATE',
         level: 1,
       },
       {
-        name: 'WHEN DIFF PRESS < 1 PSI & FL < 100/MEA :',
-        sensed: false,
+        name: 'MAX FL : 100/MEA-MORA',
+        sensed: true,
+        style: ChecklistLineStyle.Cyan,
+        level: 1,
+      },
+      {
+        name: 'WHEN DIFF PRESS < 2 PSI & FL < 100/MEA-MORA :',
+        sensed: true,
+        style: ChecklistLineStyle.Headline,
         level: 2,
       },
       {
@@ -256,9 +274,23 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
         labelNotCompleted: 'OVRD',
         level: 2,
       },
+      // In flight, if below FL 100
       {
-        name: 'MAX FL : 100/MEA',
-        sensed: false,
+        name: 'MAX FL : 100/MEA-MORA',
+        sensed: true,
+        style: ChecklistLineStyle.Cyan,
+        level: 1,
+      },
+      {
+        name: 'RAM AIR:',
+        sensed: true,
+        labelNotCompleted: 'ON',
+        level: 1,
+      },
+      {
+        name: 'CABIN AIR EXTRACT',
+        sensed: true,
+        labelNotCompleted: 'OVRD',
         level: 1,
       },
     ],
@@ -292,7 +324,13 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
   211800026: {
     title: '\x1b<4m\x1b4mCOND\x1bm BULK CARGO ISOL FAULT  ',
     sensed: true,
-    items: [],
+    items: [
+      {
+        name: 'BULK ISOL VALVES',
+        sensed: true,
+        labelNotCompleted: 'OFF',
+      },
+    ],
   },
   211800027: {
     title: '\x1b<4m\x1b4mCOND\x1bm BULK CARGO VENT FAULT  ',
@@ -307,7 +345,13 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
   211800029: {
     title: '\x1b<4m\x1b4mCOND\x1bm FWD CARGO ISOL FAULT  ',
     sensed: true,
-    items: [],
+    items: [
+      {
+        name: 'FWD ISOL VALVES',
+        sensed: true,
+        labelNotCompleted: 'OFF',
+      },
+    ],
   },
   211800030: {
     title: '\x1b<4m\x1b4mCOND\x1bm FWD CARGO TEMP REGUL FAULT  ',
@@ -365,12 +409,12 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
     items: [],
   },
   211800039: {
-    title: '\x1b<4m\x1b4mCOND\x1bm TEMP CTL 1 FAULT   ',
+    title: '\x1b<4m\x1b4mCOND\x1bm TEMP CTL 1 FAULT',
     sensed: true,
     items: [],
   },
   211800040: {
-    title: '\x1b<4m\x1b4mCOND\x1bm TEMP CTL 2 FAULT  ',
+    title: '\x1b<4m\x1b4mCOND\x1bm TEMP CTL 2 FAULT',
     sensed: true,
     items: [],
   },
@@ -408,6 +452,31 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
         labelNotCompleted: 'OFF',
       },
     ],
+  },
+  211800046: {
+    title: '\x1b<4m\x1b4mCOND\x1bm HOT AIR 1 OFF',
+    sensed: true,
+    items: [],
+  },
+  211800047: {
+    title: '\x1b<4m\x1b4mCOND\x1bm HOT AIR 2 OFF',
+    sensed: true,
+    items: [],
+  },
+  211800048: {
+    title: '\x1b<4m\x1b4mCOND\x1bm HOT AIR 1 VLV OPEN',
+    sensed: true,
+    items: [],
+  },
+  211800049: {
+    title: '\x1b<4m\x1b4mCOND\x1bm HOT AIR 2 VLV OPEN',
+    sensed: true,
+    items: [],
+  },
+  211800050: {
+    title: '\x1b<4m\x1b4mCOND\x1bm TEMP CTL DEGRADED',
+    sensed: true,
+    items: [],
   },
   // ATA 21: VENT
   212800001: {
@@ -703,27 +772,38 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
   },
   // ATA 21: PRESS
   213800001: {
-    title: '\x1b<4m\x1b4mCAB PRESS\x1bm EXCESS CAB ALT',
+    title: '\x1b<2m\x1b4mCAB PRESS\x1bm EXCESS CAB ALT',
     sensed: true,
     items: [
       {
         name: 'CREW OXY MASKS',
-        sensed: true,
+        sensed: false,
         labelNotCompleted: 'USE',
       },
       {
+        name: 'CABIN CREW',
+        sensed: false,
+        labelNotCompleted: 'ADVICE',
+      },
+      {
         name: 'DESCENT',
-        sensed: true,
+        sensed: false,
         labelNotCompleted: 'INITIATE',
       },
       {
         name: 'EMER DESCENT:',
-        sensed: false,
+        sensed: true,
+        style: ChecklistLineStyle.Headline,
       },
       {
-        name: 'SIGNS',
-        sensed: true,
-        labelNotCompleted: 'ON',
+        name: 'EMER DESCENT (PA)',
+        sensed: false,
+        labelNotCompleted: 'ANNOUNCE',
+      },
+      {
+        name: 'DESCENT',
+        sensed: false,
+        labelNotCompleted: 'INITIATE',
       },
       {
         name: 'ALL THR LEVERS',
@@ -740,16 +820,31 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
         name: 'SPEED',
         sensed: false,
         labelNotCompleted: 'MAX/APPROPRIATE',
-        level: 1,
       },
       {
         name: 'ATC',
-        sensed: true,
+        sensed: false,
         labelNotCompleted: 'NOTIFY',
       },
       {
-        name: 'MAX FL: 100/MEA',
+        name: 'ATC SQUAWK 7700',
         sensed: false,
+        labelNotCompleted: 'CONSIDER',
+      },
+      {
+        name: 'ATC COM EMER MSG',
+        sensed: false,
+        labelNotCompleted: 'CONSIDER',
+      },
+      {
+        name: 'MAX FL: 100/MEA',
+        sensed: true,
+        style: ChecklistLineStyle.Cyan,
+      },
+      {
+        name: 'IF CAB ALT ABOVE 14000 FT:',
+        sensed: true,
+        style: ChecklistLineStyle.Headline,
       },
       {
         name: 'PAX OXY MASK MAN ON',
@@ -757,15 +852,55 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
         labelNotCompleted: 'PRESS',
       },
       {
-        name: 'CREW OXY MASKS DILUTION',
+        name: 'WHEN DESCENT ESTABLISHED:',
         sensed: true,
+        level: 1,
+        style: ChecklistLineStyle.Headline,
+      },
+      {
+        name: 'CREW OXY MASKS DILUTION',
+        sensed: false,
         labelNotCompleted: 'N',
+        level: 1,
+      },
+      {
+        name: 'WHEN DIFF PR < 2 PSI & FL < 100/MEA-MORA:',
+        sensed: true,
+        style: ChecklistLineStyle.Headline,
+      },
+      {
+        name: 'RAM AIR',
+        sensed: true,
+        labelNotCompleted: 'ON',
+      },
+      {
+        name: 'IF DIFF PRESS > 1 PSI',
+        sensed: true,
+        level: 1,
+        style: ChecklistLineStyle.Headline,
+      },
+      {
+        name: 'CABIN AIR EXTRACT',
+        sensed: true,
+        labelNotCompleted: 'OVRD',
+        level: 1,
+      },
+      {
+        name: 'WHEN ALL OUTFLW VLVs OPEN',
+        sensed: true,
+        level: 1,
+        style: ChecklistLineStyle.Headline,
+      },
+      {
+        name: 'CABIN AIR EXTRACT (OVRD)',
+        sensed: true,
+        labelNotCompleted: 'DESELECT',
         level: 1,
       },
     ],
   },
   213800002: {
-    title: '\x1b<4m\x1b4mCAB PRESS\x1bm EXCESS DIFF PRESS',
+    title: '\x1b<2m\x1b4mCAB PRESS\x1bm EXCESS DIFF PRESS',
     sensed: true,
     items: [
       {
@@ -786,11 +921,14 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
       },
       {
         name: 'MAX FL: 100/MEA',
-        sensed: false,
+        sensed: true,
+        style: ChecklistLineStyle.Cyan,
       },
       {
         name: 'WHEN DIFF PRESS < 1 PSI & FL < 100/MEA :',
-        sensed: false,
+        sensed: true,
+        style: ChecklistLineStyle.Headline,
+        level: 1,
       },
       {
         name: 'RAM AIR',
@@ -865,69 +1003,62 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
     sensed: true,
     items: [
       {
-        name: 'AUTO CTL SYS 1 FAULT',
-        sensed: false,
-      },
-      {
-        name: 'AUTO CTL SYS 2 FAULT',
-        sensed: false,
-      },
-      {
-        name: 'AUTO CTL SYS 3 FAULT',
-        sensed: false,
-      },
-      {
-        name: 'AUTO CTL SYS 4 FAULT',
-        sensed: false,
-      },
-      {
         name: 'AUTO CTL SYS 1+2+3+4 FAULT',
-        sensed: false,
-        level: 1,
+        sensed: true,
+        style: ChecklistLineStyle.Amber,
       },
       {
         name: 'CAB PRESS IN BACKUP MODE',
-        sensed: false,
+        sensed: true,
+        style: ChecklistLineStyle.Green,
         level: 1,
       },
       {
         name: 'CAB PRESS MAN MODES : DO NOT USE',
-        sensed: false,
+        sensed: true,
+        style: ChecklistLineStyle.Cyan,
         level: 1,
       },
       {
-        name: 'CAB ALT REGULATED TO 7000 FT',
-        sensed: false,
+        name: 'IN DES : CAB ALT REGULATED TO 7000 FT',
+        sensed: true,
+        style: ChecklistLineStyle.Green,
         level: 1,
       },
       {
         name: 'BELOW 7000 FT : CAB ALT = ACFT ALT',
-        sensed: false,
+        sensed: true,
+        style: ChecklistLineStyle.Green,
         level: 1,
       },
       {
         name: 'BELOW 7000 FT : AVOID HI DES V/S',
-        sensed: false,
+        sensed: true,
+        style: ChecklistLineStyle.Cyan,
         level: 1,
       },
       {
         name: 'CABIN ALT REGULATED TO 7500FT',
-        sensed: false,
+        sensed: true,
+        style: ChecklistLineStyle.Green,
         level: 2,
       },
       {
         name: 'CAB PRESS MAN MODES : DO NOT USE',
-        sensed: false,
+        sensed: true,
+        style: ChecklistLineStyle.Headline,
         level: 2,
       },
       {
         name: 'BELOW 7500 FT : CAB ALT = ACFT ALT',
-        sensed: false,
+        sensed: true,
+        style: ChecklistLineStyle.Green,
         level: 2,
       },
       {
         name: 'BELOW 7500 FT : AVOID HI DES V/S',
-        sensed: false,
+        sensed: true,
+        style: ChecklistLineStyle.Cyan,
         level: 2,
       },
       {
@@ -938,7 +1069,7 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
       },
       {
         name: 'CABIN ALT TRGT',
-        sensed: true,
+        sensed: false,
         labelNotCompleted: 'AS RQRD',
         level: 1,
       },
@@ -947,22 +1078,7 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
   213800006: {
     title: '\x1b<4m\x1b4mCAB PRESS\x1bm CTL REDUNDANCY LOST',
     sensed: true,
-    items: [
-      {
-        name: 'CABIN ALT MODE',
-        sensed: true,
-        labelNotCompleted: 'MAN',
-      },
-      {
-        name: 'CABIN ALT TARGET',
-        sensed: true,
-        labelNotCompleted: 'AS RQRD',
-      },
-      {
-        name: 'EXPECT HI CAB RATE',
-        sensed: false,
-      },
-    ],
+    items: [],
   },
   213800007: {
     title: '\x1b<4m\x1b4mCAB PRESS\x1bm DIFF PRESS HI',
@@ -1060,12 +1176,13 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
       },
       {
         name: 'DIFF PRESS',
-        sensed: true,
+        sensed: false,
         labelNotCompleted: 'MONITOR',
       },
       {
         name: 'IF DIFF PRESS > 9.6 PSI :',
-        sensed: false,
+        sensed: true,
+        style: ChecklistLineStyle.Headline,
         level: 1,
       },
       {
@@ -1082,18 +1199,20 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
       },
       {
         name: 'DESCENT TO FL 100/MEA',
-        sensed: true,
+        sensed: false,
         labelNotCompleted: 'INITIATE',
         level: 2,
       },
       {
         name: 'MAX FL : 100/MEA',
-        sensed: false,
+        sensed: true,
+        style: ChecklistLineStyle.Cyan,
         level: 1,
       },
       {
         name: 'WHEN FL < 100 / MEA :',
-        sensed: false,
+        sensed: true,
+        style: ChecklistLineStyle.Headline,
         level: 3,
       },
       {
@@ -1122,7 +1241,8 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
       },
       {
         name: 'BEFORE OPENING ANY CABIN DOOR :',
-        sensed: false,
+        sensed: true,
+        style: ChecklistLineStyle.Headline,
         level: 1,
       },
       {
@@ -1139,12 +1259,12 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
       },
       {
         name: 'CABIN CREW',
-        sensed: true,
+        sensed: false,
         labelNotCompleted: 'ADVISE',
       },
       {
         name: 'RESIDUAL DIFF PRESS',
-        sensed: true,
+        sensed: false,
         labelNotCompleted: 'CHECK',
       },
     ],
@@ -1155,93 +1275,48 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
     items: [],
   },
   213800019: {
-    title: '\x1b<4m\x1b4mCAB PRESS\x1bm OUTFLW VLV CTL FAULT OUTFLW VLV 1+2+3',
+    title: '\x1b<4m\x1b4mCAB PRESS\x1bm OUTFLW VLV CTL FAULT',
     sensed: true,
     items: [
       {
-        name: 'CABIN ALT MODE',
+        name: 'OUTFLW VLV 1+2+3',
         sensed: true,
-        labelNotCompleted: 'MAN',
-      },
-      {
-        name: 'ACFT FL CABIN ALT TRGT',
-        sensed: false,
-      },
-      {
-        name: 'CABIN ALT TRGT',
-        sensed: true,
-        labelNotCompleted: 'AS RQRD',
-      },
-      {
-        name: 'CABIN ALT REGULATED TO 7500FT',
-        sensed: false,
-      },
-      {
-        name: 'CAB PRESS MAN MODES : DO NOT USE',
-        sensed: false,
-      },
-      {
-        name: 'BELOW 7500 FT : CAB ALT = ACFT ALT',
-        sensed: false,
-      },
-      {
-        name: 'BELOW 7500 FT : AVOID HI DES V/S',
-        sensed: false,
+        style: ChecklistLineStyle.Amber,
       },
     ],
   },
   213800020: {
-    title: '\x1b<4m\x1b4mCAB PRESS\x1bm OUTFLW VLV CTL FAULT OUTFLW VLV 1+2+4',
+    title: '\x1b<4m\x1b4mCAB PRESS\x1bm OUTFLW VLV CTL FAULT',
     sensed: true,
     items: [
       {
-        name: 'CABIN ALT MODE',
+        name: 'OUTFLW VLV 1+2+4',
         sensed: true,
-        labelNotCompleted: 'MAN',
-      },
-      {
-        name: 'ACFT FL CABIN ALT TRGT',
-        sensed: false,
-      },
-      {
-        name: 'CABIN ALT TRGT',
-        sensed: true,
-        labelNotCompleted: 'AS RQRD',
-      },
-      {
-        name: 'CABIN ALT REGULATED TO 7500FT',
-        sensed: false,
-      },
-      {
-        name: 'CAB PRESS MAN MODES : DO NOT USE',
-        sensed: false,
-      },
-      {
-        name: 'BELOW 7500 FT : CAB ALT = ACFT ALT',
-        sensed: false,
-      },
-      {
-        name: 'BELOW 7500 FT : AVOID HI DES V/S',
-        sensed: false,
+        style: ChecklistLineStyle.Amber,
       },
     ],
   },
   213800021: {
-    title: '\x1b<4m\x1b4mCAB PRESS\x1bm OUTFLW VLV CTL FAULT OUTFLW VLV 1+3+4',
+    title: '\x1b<4m\x1b4mCAB PRESS\x1bm OUTFLW VLV CTL FAULT',
     sensed: true,
     items: [
+      {
+        name: ' OUTFLW VLV 1+3+4',
+        sensed: true,
+        style: ChecklistLineStyle.Amber,
+      },
       {
         name: 'CABIN ALT MODE',
         sensed: true,
         labelNotCompleted: 'MAN',
       },
-      {
-        name: 'ACFT FL CABIN ALT TRGT',
-        sensed: false,
-      },
+      // {
+      //   name: 'ACFT FL CABIN ALT TRGT',
+      //   sensed: false,
+      // },
       {
         name: 'CABIN ALT TRGT',
-        sensed: true,
+        sensed: false,
         labelNotCompleted: 'AS RQRD',
       },
       {
@@ -1263,254 +1338,233 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
     ],
   },
   213800022: {
-    title: '\x1b<4m\x1b4mCAB PRESS\x1bm OUTFLW VLV CTL FAULT OUTFLW VLV 2+3+4',
+    title: '\x1b<4m\x1b4mCAB PRESS\x1bm OUTFLW VLV CTL FAULT',
     sensed: true,
     items: [
       {
-        name: 'CABIN ALT MODE',
+        name: 'OUTFLW VLV 2+3+4',
         sensed: true,
-        labelNotCompleted: 'MAN',
-      },
-      {
-        name: 'ACFT FL CABIN ALT TRGT',
-        sensed: false,
-      },
-      {
-        name: 'CABIN ALT TRGT',
-        sensed: true,
-        labelNotCompleted: 'AS RQRD',
-      },
-      {
-        name: 'CABIN ALT REGULATED TO 7500FT',
-        sensed: false,
-      },
-      {
-        name: 'CAB PRESS MAN MODES : DO NOT USE',
-        sensed: false,
-      },
-      {
-        name: 'BELOW 7500 FT : CAB ALT = ACFT ALT',
-        sensed: false,
-      },
-      {
-        name: 'BELOW 7500 FT : AVOID HI DES V/S',
-        sensed: false,
+        style: ChecklistLineStyle.Amber,
       },
     ],
   },
   213800023: {
-    title: '\x1b<4m\x1b4mCAB PRESS\x1bm OUTFLW VLV CTL FAULT OUTFLW VLV 1+2',
+    title: '\x1b<4m\x1b4mCAB PRESS\x1bm OUTFLW VLV CTL FAULT',
     sensed: true,
     items: [
       {
-        name: 'CABIN ALT MODE',
+        name: 'OUTFLW VLV 1+2',
         sensed: true,
-        labelNotCompleted: 'MAN',
-      },
-      {
-        name: 'ACFT FL CABIN ALT TRGT',
-        sensed: false,
-      },
-      {
-        name: 'CABIN ALT TRGT',
-        sensed: true,
-        labelNotCompleted: 'AS RQRD',
-      },
-      {
-        name: 'CABIN ALT REGULATED TO 7500FT',
-        sensed: false,
-      },
-      {
-        name: 'CAB PRESS MAN MODES : DO NOT USE',
-        sensed: false,
-      },
-      {
-        name: 'BELOW 7500 FT : CAB ALT = ACFT ALT',
-        sensed: false,
-      },
-      {
-        name: 'BELOW 7500 FT : AVOID HI DES V/S',
-        sensed: false,
+        style: ChecklistLineStyle.Amber,
       },
     ],
   },
   213800024: {
-    title: '\x1b<4m\x1b4mCAB PRESS\x1bm OUTFLW VLV CTL FAULT OUTFLW VLV 1+3',
+    title: '\x1b<4m\x1b4mCAB PRESS\x1bm OUTFLW VLV CTL FAULT',
     sensed: true,
     items: [
       {
-        name: 'CABIN ALT MODE',
+        name: 'OUTFLW VLV 1+3',
         sensed: true,
-        labelNotCompleted: 'MAN',
-      },
-      {
-        name: 'ACFT FL CABIN ALT TRGT',
-        sensed: false,
-      },
-      {
-        name: 'CABIN ALT TRGT',
-        sensed: true,
-        labelNotCompleted: 'AS RQRD',
-      },
-      {
-        name: 'CABIN ALT REGULATED TO 7500FT',
-        sensed: false,
-      },
-      {
-        name: 'CAB PRESS MAN MODES : DO NOT USE',
-        sensed: false,
-      },
-      {
-        name: 'BELOW 7500 FT : CAB ALT = ACFT ALT',
-        sensed: false,
-      },
-      {
-        name: 'BELOW 7500 FT : AVOID HI DES V/S',
-        sensed: false,
+        style: ChecklistLineStyle.Amber,
       },
     ],
   },
   213800025: {
-    title: '\x1b<4m\x1b4mCAB PRESS\x1bm OUTFLW VLV CTL FAULT OUTFLW VLV 1+4',
+    title: '\x1b<4m\x1b4mCAB PRESS\x1bm OUTFLW VLV CTL FAULT',
     sensed: true,
     items: [
       {
-        name: 'CABIN ALT MODE',
+        name: 'OUTFLW VLV 1+4',
         sensed: true,
-        labelNotCompleted: 'MAN',
-      },
-      {
-        name: 'ACFT FL CABIN ALT TRGT',
-        sensed: false,
-      },
-      {
-        name: 'CABIN ALT TRGT',
-        sensed: true,
-        labelNotCompleted: 'AS RQRD',
-      },
-      {
-        name: 'CABIN ALT REGULATED TO 7500FT',
-        sensed: false,
-      },
-      {
-        name: 'CAB PRESS MAN MODES : DO NOT USE',
-        sensed: false,
-      },
-      {
-        name: 'BELOW 7500 FT : CAB ALT = ACFT ALT',
-        sensed: false,
-      },
-      {
-        name: 'BELOW 7500 FT : AVOID HI DES V/S',
-        sensed: false,
+        style: ChecklistLineStyle.Amber,
       },
     ],
   },
   213800026: {
-    title: '\x1b<4m\x1b4mCAB PRESS\x1bm OUTFLW VLV CTL FAULT OUTFLW VLV 2+3',
+    title: '\x1b<4m\x1b4mCAB PRESS\x1bm OUTFLW VLV CTL FAULT',
     sensed: true,
     items: [
       {
-        name: 'CABIN ALT MODE',
+        name: 'OUTFLW VLV 2+3',
         sensed: true,
-        labelNotCompleted: 'MAN',
-      },
-      {
-        name: 'ACFT FL CABIN ALT TRGT',
-        sensed: false,
-      },
-      {
-        name: 'CABIN ALT TRGT',
-        sensed: true,
-        labelNotCompleted: 'AS RQRD',
-      },
-      {
-        name: 'CABIN ALT REGULATED TO 7500FT',
-        sensed: false,
-      },
-      {
-        name: 'CAB PRESS MAN MODES : DO NOT USE',
-        sensed: false,
-      },
-      {
-        name: 'BELOW 7500 FT : CAB ALT = ACFT ALT',
-        sensed: false,
-      },
-      {
-        name: 'BELOW 7500 FT : AVOID HI DES V/S',
-        sensed: false,
+        style: ChecklistLineStyle.Amber,
       },
     ],
   },
   213800027: {
-    title: '\x1b<4m\x1b4mCAB PRESS\x1bm OUTFLW VLV CTL FAULT OUTFLW VLV 2+4',
+    title: '\x1b<4m\x1b4mCAB PRESS\x1bm OUTFLW VLV CTL FAULT',
     sensed: true,
     items: [
       {
-        name: 'CABIN ALT MODE',
+        name: 'OUTFLW VLV 2+4',
         sensed: true,
-        labelNotCompleted: 'MAN',
-      },
-      {
-        name: 'ACFT FL CABIN ALT TRGT',
-        sensed: false,
-      },
-      {
-        name: 'CABIN ALT TRGT',
-        sensed: true,
-        labelNotCompleted: 'AS RQRD',
-      },
-      {
-        name: 'CABIN ALT REGULATED TO 7500FT',
-        sensed: false,
-      },
-      {
-        name: 'CAB PRESS MAN MODES : DO NOT USE',
-        sensed: false,
-      },
-      {
-        name: 'BELOW 7500 FT : CAB ALT = ACFT ALT',
-        sensed: false,
-      },
-      {
-        name: 'BELOW 7500 FT : AVOID HI DES V/S',
-        sensed: false,
+        style: ChecklistLineStyle.Amber,
       },
     ],
   },
   213800028: {
-    title: '\x1b<4m\x1b4mCAB PRESS\x1bm OUTFLW VLV CTL FAULT OUTFLW VLV 3+4',
+    title: '\x1b<4m\x1b4mCAB PRESS\x1bm OUTFLW VLV CTL FAULT',
     sensed: true,
     items: [
       {
-        name: 'CABIN ALT MODE',
+        name: 'OUTFLW VLV 3+4',
         sensed: true,
-        labelNotCompleted: 'MAN',
+        style: ChecklistLineStyle.Amber,
       },
+    ],
+  },
+  213800029: {
+    title: '\x1b<4m\x1b4mCAB PRESS\x1bm AUTO CTL FAULT',
+    sensed: true,
+    items: [
       {
-        name: 'ACFT FL CABIN ALT TRGT',
-        sensed: false,
-      },
-      {
-        name: 'CABIN ALT TRGT',
+        name: 'AUTO CTL SYS 1 FAULT',
         sensed: true,
-        labelNotCompleted: 'AS RQRD',
+        style: ChecklistLineStyle.Amber,
       },
+    ],
+  },
+  213800030: {
+    title: '\x1b<4m\x1b4mCAB PRESS\x1bm AUTO CTL FAULT',
+    sensed: true,
+    items: [
       {
-        name: 'CABIN ALT REGULATED TO 7500FT',
-        sensed: false,
+        name: 'AUTO CTL SYS 2 FAULT',
+        sensed: true,
+        style: ChecklistLineStyle.Amber,
       },
+    ],
+  },
+  213800031: {
+    title: '\x1b<4m\x1b4mCAB PRESS\x1bm AUTO CTL FAULT',
+    sensed: true,
+    items: [
       {
-        name: 'CAB PRESS MAN MODES : DO NOT USE',
-        sensed: false,
+        name: 'AUTO CTL SYS 3 FAULT',
+        sensed: true,
+        style: ChecklistLineStyle.Amber,
       },
+    ],
+  },
+  213800032: {
+    title: '\x1b<4m\x1b4mCAB PRESS\x1bm AUTO CTL FAULT',
+    sensed: true,
+    items: [
       {
-        name: 'BELOW 7500 FT : CAB ALT = ACFT ALT',
-        sensed: false,
+        name: 'AUTO CTL SYS 4 FAULT',
+        sensed: true,
+        style: ChecklistLineStyle.Amber,
       },
+    ],
+  },
+  213800033: {
+    title: '\x1b<4m\x1b4mCAB PRESS\x1bm AUTO CTL FAULT',
+    sensed: true,
+    items: [
       {
-        name: 'BELOW 7500 FT : AVOID HI DES V/S',
-        sensed: false,
+        name: 'AUTO CTL SYS 1+2 FAULT',
+        sensed: true,
+        style: ChecklistLineStyle.Amber,
+      },
+    ],
+  },
+  213800034: {
+    title: '\x1b<4m\x1b4mCAB PRESS\x1bm AUTO CTL FAULT',
+    sensed: true,
+    items: [
+      {
+        name: 'AUTO CTL SYS 1+3 FAULT',
+        sensed: true,
+        style: ChecklistLineStyle.Amber,
+      },
+    ],
+  },
+  213800035: {
+    title: '\x1b<4m\x1b4mCAB PRESS\x1bm AUTO CTL FAULT',
+    sensed: true,
+    items: [
+      {
+        name: 'AUTO CTL SYS 1+4 FAULT',
+        sensed: true,
+        style: ChecklistLineStyle.Amber,
+      },
+    ],
+  },
+  213800036: {
+    title: '\x1b<4m\x1b4mCAB PRESS\x1bm AUTO CTL FAULT',
+    sensed: true,
+    items: [
+      {
+        name: 'AUTO CTL SYS 2+3 FAULT',
+        sensed: true,
+        style: ChecklistLineStyle.Amber,
+      },
+    ],
+  },
+  213800037: {
+    title: '\x1b<4m\x1b4mCAB PRESS\x1bm AUTO CTL FAULT',
+    sensed: true,
+    items: [
+      {
+        name: 'AUTO CTL SYS 2+4 FAULT',
+        sensed: true,
+        style: ChecklistLineStyle.Amber,
+      },
+    ],
+  },
+  213800038: {
+    title: '\x1b<4m\x1b4mCAB PRESS\x1bm AUTO CTL FAULT',
+    sensed: true,
+    items: [
+      {
+        name: 'AUTO CTL SYS 3+4 FAULT',
+        sensed: true,
+        style: ChecklistLineStyle.Amber,
+      },
+    ],
+  },
+  213800039: {
+    title: '\x1b<4m\x1b4mCAB PRESS\x1bm AUTO CTL FAULT',
+    sensed: true,
+    items: [
+      {
+        name: 'AUTO CTL SYS 1+2+3 FAULT',
+        sensed: true,
+        style: ChecklistLineStyle.Amber,
+      },
+    ],
+  },
+  213800040: {
+    title: '\x1b<4m\x1b4mCAB PRESS\x1bm AUTO CTL FAULT',
+    sensed: true,
+    items: [
+      {
+        name: 'AUTO CTL SYS 1+2+4 FAULT',
+        sensed: true,
+        style: ChecklistLineStyle.Amber,
+      },
+    ],
+  },
+  213800041: {
+    title: '\x1b<4m\x1b4mCAB PRESS\x1bm AUTO CTL FAULT',
+    sensed: true,
+    items: [
+      {
+        name: 'AUTO CTL SYS 1+3+4 FAULT',
+        sensed: true,
+        style: ChecklistLineStyle.Amber,
+      },
+    ],
+  },
+  213800042: {
+    title: '\x1b<4m\x1b4mCAB PRESS\x1bm AUTO CTL FAULT',
+    sensed: true,
+    items: [
+      {
+        name: 'AUTO CTL SYS 2+3+4 FAULT',
+        sensed: true,
+        style: ChecklistLineStyle.Amber,
       },
     ],
   },
@@ -1518,7 +1572,7 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
   220800001: {
     title: '\x1b<2m\x1b4mAUTO FLT\x1bm AP OFF',
     sensed: true,
-    items: [], // TODO
+    items: [],
   },
   220800002: {
     title: '\x1b<2mAUTOLAND',
@@ -1793,6 +1847,27 @@ export const EcamAbnormalSensedAta212223: { [n: number]: AbnormalProcedure } = {
   },
   221800007: {
     title: '\x1b<4m\x1b4mT.O\x1bm SPEEDS NOT INSERTED',
+    sensed: true,
+    items: [],
+  },
+  221800008: {
+    title: '\x1b<4m\x1b4mT.O\x1bm SPEEDS TOO LOW',
+    sensed: true,
+    items: [
+      {
+        name: 'TOW & T.O DATA',
+        sensed: false,
+        labelNotCompleted: 'CHECK',
+      },
+    ],
+  },
+  221800009: {
+    title: '\x1b<4m\x1b4mT.O\x1bm V1/VR/V2 DISAGREE',
+    sensed: true,
+    items: [],
+  },
+  221800010: {
+    title: '\x1b<2m\x1b4mT.O\x1bm ACCELERATION DEGRADED',
     sensed: true,
     items: [],
   },

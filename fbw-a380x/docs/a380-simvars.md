@@ -5,7 +5,7 @@
 - [A380 Local SimVars](#a380-local-simvars)
   - [Contents](#contents)
   - [Uncategorized](#uncategorized)
-  - [Air Conditioning / Pressurisation / Ventilation ATA  21](#air-conditioning-pressurisation-ventilation-ata-21)
+  - [Air Conditioning Pressurisation Ventilation ATA 21](#air-conditioning-pressurisation-ventilation-ata-21)
   - [Auto Flight System ATA 22](#auto-flight-system-ata-22)
   - [Flight Management System ATA 22](#flight-management-system-ata-22)
   - [Electrical ATA 24](#electrical-ata-24)
@@ -17,6 +17,7 @@
   - [Bleed Air ATA 36](#bleed-air-ata-36)
   - [Integrated Modular Avionics ATA 42](#integrated-modular-avionics-ata-42)
   - [Auxiliary Power Unit ATA 49](#auxiliary-power-unit-ata-49)
+  - [Engines ATA 70](#engines-ata-70)
   - [Hydraulics](#hydraulics)
   - [Sound Variables](#sound-variables)
   - [Autobrakes](#autobrakes)
@@ -104,7 +105,7 @@
     - Number
     - The position of the battery display knob from left to right
     - ESS=0, APU=1, OFF=2, BAT1=3, BAT2=4
-    - Mapped to battery voltage indexes: {bat_index} = ESS=4 | APU=3 | OFF=0 | BAT1=1 | BAT2=2
+    - Mapped to battery voltage indexes: {bat_index} = ESS=3 | APU=4 | OFF=0 | BAT1=1 | BAT2=2
         - A32NX_ELEC_BAT_{bat_index}_POTENTIAL is used to get the voltage
 
 - A32NX_NOSE_WHEEL_LEFT_ANIM_ANGLE
@@ -114,6 +115,15 @@
 - A32NX_NOSE_WHEEL_RIGHT_ANIM_ANGLE
     - Degrees
     - Angular position of right nose wheel (in wheel axis not steering)
+
+- A32NX_BRAKE_TEMPERATURE_{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}
+    - celsius
+    - represents the brake temperature of the main wheels
+
+- A32NX_REPORTED_BRAKE_TEMPERATURE_{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}
+    - celsius
+    - represents the reported brake temperature of the main wheels by the sensor.
+    - Since no CPIOM G is implemented yet these are the values directly reported by the sensor.
 
 
 - A32NX_LIGHTING_PRESET_LOAD
@@ -214,6 +224,8 @@
       | 20  | Primary Fan 3 Fault                                  |
       | 21  | Primary Fan 4 Fault                                  |
       | 22  | Bulk Heater Fault                                    |
+      | 23  | FWD isolation valve Fault                            |
+      | 24  | Bulk isolation valve Fault                           |
 
 - A32NX_COND_CPIOM_B{id}_CPCS_DISCRETE_WORD
     - Arinc429<Discrete>
@@ -345,6 +357,10 @@
         - B3
         - B4
 
+- A32NX_PRESS_MAN_CABIN_DELTA_PRESSURE
+    - PSI
+    - As above, but analog system transmitted by the manual partition of CPC1
+
 - A32NX_PRESS_OCSM_{id1}_CHANNEL_{id2}_FAILURE
     - Bool
     - True if the channel is failed
@@ -434,6 +450,10 @@
 - A32NX_FMS_PAX_NUMBER
     - Number
     - Number of passengers entered on FMS/ACTIVE/FUEL&LOAD page
+
+- A32NX_SPEEDS_MANAGED_SHORT_TERM_PFD
+    - Number
+    - The short term managed speed displayed on the PFD
 
 ## Flight Management System ATA 22
 
@@ -785,6 +805,18 @@
       | 28  | Slat System Jam                          |
       | 29  | Flap System Jam                          |
 
+- A32NX_FLAPS_CONF_INDEX
+  - Number
+  - Indicates the desired flap configuration index according to the table
+  - Value | Meaning
+            --- | ---
+      0 | Conf0
+      1 | Conf1
+      2 | Conf1F
+      3 | Conf2
+      4 | Conf2S
+      5 | Conf3
+      6 | Conf4
 
 ## Indicating-Recording ATA 31
 
@@ -842,25 +874,47 @@
 
 ## ECAM Control Panel ATA 31
 
-- A380X_ECAM_CP_SELECTED_PAGE
+- A32NX_BTN_{button_name}
+    - Number
+    - Button state of the ECAM CP buttons
+        - 0: Not pressed, 1: Pressed
+    - {button_name}
+        - ALL
+        - ABNPROC
+        - CHECK_LH
+        - CHECK_RH
+        - CL
+        - CLR
+        - CLR2
+        - DOWN
+        - EMERCANC
+        - MORE
+        - RCL
+        - TOCONFIG
+        - UP
+
+- A32NX_ECAM_SD_CURRENT_PAGE_INDEX
     - Enum
-    - Currently requested page on the ECAM CP
+- Currently requested page on the ECAM CP
     - | State | Value |
       |-------|-------|
       | ENG   | 0     |
-      | BLEED | 1     |
-      | PRESS | 2     |
-      | EL/AC | 3     |
-      | FUEL  | 4     |
-      | HYD   | 5     |
-      | C/B   | 6     |
-      | APU   | 7     |
-      | COND  | 8     |
-      | DOOR  | 9     |
-      | EL/DC | 10    |
-      | WHEEL | 11    |
-      | F/CTL | 12    |
-      | VIDEO | 13    |
+      | APU   | 1     |
+      | BLEED | 2     |
+      | COND  | 3     |
+      | PRESS | 4     |
+      | DOOR  | 5     |
+      | EL/AC | 6     |
+      | EL/DC | 7     |
+      | FUEL  | 8     |
+      | WHEEL | 9     |
+      | HYD   | 10    |
+      | F/CTL | 11    |
+      | C/B   | 12    |
+      | CRZ   | 13    |
+      | STS   | 14    |
+      | VIDEO | 15    |
+
 
 ## EFIS Control Panel ATA 31
 
@@ -1031,3 +1085,9 @@
     |-------|-------------|
     | 0     | Left Seat   |
     | 1     | Right Seat  |
+
+- `L:A32NX_EXT_PWR_AVAIL:{number}`
+  - Bool
+  - If ground power is avail or not
+  - {number}
+        - 1 - 4

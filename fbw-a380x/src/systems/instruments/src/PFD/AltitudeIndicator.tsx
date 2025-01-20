@@ -37,7 +37,7 @@ class LandingElevationIndicator extends DisplayComponent<{ bus: ArincEventBus }>
     const delta = this.altitude - this.landingElevation.value;
     const offset = ((delta - DisplayRange) * DistanceSpacing) / ValueSpacing;
     this.delta = delta;
-    if (delta > DisplayRange || (this.flightPhase !== 7 && this.flightPhase !== 8) || !landingElevationValid) {
+    if (delta > DisplayRange || (this.flightPhase !== 9 && this.flightPhase !== 10) || !landingElevationValid) {
       this.landingElevationIndicator.instance.classList.add('HiddenElement');
     } else {
       this.landingElevationIndicator.instance.classList.remove('HiddenElement');
@@ -952,7 +952,7 @@ class MetricAltIndicator extends DisplayComponent<{ bus: EventBus }> {
         <text
           ref={this.metricAltText}
           id="MetricAltText"
-          class="FontMedium Cyan MiddleAlign"
+          class="FontMedium Green MiddleAlign"
           x="128.64708"
           y="145.86191"
         >
@@ -962,7 +962,7 @@ class MetricAltIndicator extends DisplayComponent<{ bus: EventBus }> {
           <text
             id="MetricAltTargetText"
             ref={this.metricAltTargetText}
-            class="FontSmallest Green MiddleAlign"
+            class="FontSmallest Cyan MiddleAlign"
             x="94.088852"
             y="37.926617"
           >

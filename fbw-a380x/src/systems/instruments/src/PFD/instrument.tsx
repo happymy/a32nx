@@ -10,8 +10,7 @@ import { PFDSimvarPublisher } from './shared/PFDSimvarPublisher';
 import { SimplaneValueProvider } from 'instruments/src/MsfsAvionicsCommon/providers/SimplaneValueProvider';
 
 import './style.scss';
-import { RopRowOansPublisher, TawsPublisher } from '@flybywiresim/msfs-avionics-common';
-import { PfdSpeedsDropInSimvarPublisher } from 'instruments/src/PFD/shared/PfdSpeedsDropInPublisher';
+import { FwcPublisher, RopRowOansPublisher, SecPublisher, TawsPublisher } from '@flybywiresim/msfs-avionics-common';
 import { FwsPfdSimvarPublisher } from 'instruments/src/MsfsAvionicsCommon/providers/FwsPfdPublisher';
 
 class A380X_PFD extends BaseInstrument {
@@ -27,9 +26,6 @@ class A380X_PFD extends BaseInstrument {
 
   private readonly arincProvider = new ArincValueProvider(this.bus);
 
-  // FIXME when PRIM FE is implemented
-  private readonly pfdSpeedsProvider = new PfdSpeedsDropInSimvarPublisher(this.bus);
-
   private readonly simplaneValueProvider = new SimplaneValueProvider(this.bus);
 
   private readonly adirsValueProvider = new AdirsValueProvider(this.bus, this.simVarPublisher);
@@ -38,7 +34,11 @@ class A380X_PFD extends BaseInstrument {
 
   private readonly fmsDataPublisher: FmsDataPublisher;
 
+  private readonly fwsPublisher = new FwcPublisher(this.bus);
+
   private readonly ropRowOansPublisher = new RopRowOansPublisher(this.bus);
+
+  private readonly secPublisher = new SecPublisher(this.bus);
 
   private readonly tawsPublisher = new TawsPublisher(this.bus);
 
@@ -55,12 +55,13 @@ class A380X_PFD extends BaseInstrument {
     this.backplane.addPublisher('HEvent', this.hEventPublisher);
     this.backplane.addPublisher('PfdSimVars', this.simVarPublisher);
     this.backplane.addInstrument('ArincProvider', this.arincProvider);
-    this.backplane.addPublisher('PfdSpeeds', this.pfdSpeedsProvider);
     this.backplane.addInstrument('Simplane', this.simplaneValueProvider);
     this.backplane.addInstrument('AdirsProvider', this.adirsValueProvider);
     this.backplane.addPublisher('DmcPublisher', this.dmcPublisher);
     this.backplane.addPublisher('FmsDataPublisher', this.fmsDataPublisher);
+    this.backplane.addPublisher('FwsPublisher', this.fwsPublisher);
     this.backplane.addPublisher('RopRowOansPublisher', this.ropRowOansPublisher);
+    this.backplane.addPublisher('SecPublisher', this.secPublisher);
     this.backplane.addPublisher('TawsPublisher', this.tawsPublisher);
     this.backplane.addPublisher('FwsPfdPublisher', this.fwsPfdPublisher);
   }
@@ -95,16 +96,6 @@ class A380X_PFD extends BaseInstrument {
     super.Update();
 
     this.backplane.onUpdate();
-  }
-
-  // FIXME remove. This does not belong in the PFD, and in any case we should use GameStateProvider as it has workarounds for issues with onFlightStart
-  protected onFlightStart() {
-    super.onFlightStart();
-    if (SimVar.GetSimVarValue('L:A32NX_IS_READY', 'number') !== 1) {
-      // set ready signal that JS code is initialized and flight is actually started
-      // -> user pressed 'READY TO FLY' button
-      SimVar.SetSimVarValue('L:A32NX_IS_READY', 'number', 1);
-    }
   }
 }
 

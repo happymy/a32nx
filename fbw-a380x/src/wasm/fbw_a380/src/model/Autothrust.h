@@ -105,7 +105,7 @@ class Autothrust final
   };
 
   struct Parameters_Autothrust_T {
-    struct_QMVdjQ6NWn0vSjcEHgvQjC athr_out_MATLABStruct;
+    athr_out athr_out_MATLABStruct;
     real_T ScheduledGain1_BreakpointsForDimension1[5];
     real_T ScheduledGain2_BreakpointsForDimension1[4];
     real_T ScheduledGain4_BreakpointsForDimension1[2];
@@ -243,6 +243,7 @@ class Autothrust final
     real_T ktstomps_Gain_h;
     real_T mpstokts_Gain;
     real_T Gain4_Gain;
+    real_T Gain5_Gain;
     real_T Gain1_Gain_p1;
     real_T Gain1_Gain_di;
     real_T Gain2_Gain_c;
@@ -295,6 +296,7 @@ class Autothrust final
     rtDW_WashoutFilter_Autothrust_T *localDW);
   static void Autothrust_LagFilter(real_T rtu_U, real_T rtu_C1, real_T rtu_dt, real_T *rty_Y,
     rtDW_LagFilter_Autothrust_T *localDW);
+  static void Autothrust_A380XN1fanprotection(real_T rtu_cas, real_T rtu_n1_c, real_T *rty_n1_c_protected);
   static void Autothrust_MATLABFunction(real_T rtu_u, real_T *rty_y, boolean_T *rty_r);
   static void Autothrust_ThrustMode1(real_T rtu_u, real_T *rty_y);
   static void Autothrust_TLAComputation1(const athr_out *rtu_in, real_T rtu_TLA, real_T *rty_N1c, boolean_T
