@@ -40,7 +40,7 @@
 1. [A32NX/FMS] Added full support for EOSIDs (engine out SID) - @tracernz (Mike)
 1. [A32NX/FMS] Improved engine out detection logic and added MCDU page EO CLR - @tracernz (Mike)
 1. [FMS] Automatically delete minimums when the approach is changed - @BravoMike99 (bruno_pt99)
-
+1. [A380X/MFD] Dash TAXI fuel entry on FUEL&LOAD page after takeoff - @HendersonTyler
 
 ## 2024.1.0
 
