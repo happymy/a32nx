@@ -38,6 +38,8 @@
 1. [A380X/MFD] Worked around a sim bug where the right side cursor was sometimes oriented incorrectly - @tracernz (Mike)
 1. [A32NX/FMS] Added full support for EOSIDs (engine out SID) - @tracernz (Mike)
 1. [A32NX/FMS] Improved engine out detection logic and added MCDU page EO CLR - @tracernz (Mike)
+1. [FMS] Automatically delete minimums when the approach is changed - @BravoMike99 (bruno_pt99)
+
 
 ## 2024.1.0
 
