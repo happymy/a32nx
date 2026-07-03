@@ -41,6 +41,8 @@
 1. [A32NX/FMS] Improved engine out detection logic and added MCDU page EO CLR - @tracernz (Mike)
 1. [FMS] Automatically delete minimums when the approach is changed - @BravoMike99 (bruno_pt99)
 1. [A380X/MFD] Dash TAXI fuel entry on FUEL&LOAD page after takeoff - @HendersonTyler
+1. [A380X/MFD] Fixed TMPY being generated upon accessing  vertical revision pages - @BravoMike99 (bruno_pt99)
+1. [A380X/MFD] Alternate flightplan or go around legs can be loaded on the vertical revision pages - @BravoMike99 (bruno_pt99)
 
 ## 2024.1.0
 
