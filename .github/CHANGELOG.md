@@ -49,6 +49,7 @@
 1. [A380X/MFD] Fix LS field remaining blank on F-PLN arrival page when no landing system is available or selected - @matze-tech (matze2346)
 1. [A380X/PRIM] Move FE to PRIM and add SPD LIM flag - @lukecologne (luke)
 1. [A380X/PRIM] Improve speed trend behaviour - @lukecologne (luke)
+1. [A380X/FWS] Add NAV UNRELIABLE AIRSPEED INDICATION procedure - @matze-tech (matze2346)
 
 ## 2024.1.0
 
