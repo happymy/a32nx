@@ -742,7 +742,8 @@ export class MfdFmsPerf extends FmsPage<MfdFmsPerfProps> {
     v ? UnitType.METER : UnitType.FOOT,
   );
 
-  private readonly approachQnhFormatIsHpa = Subject.create<boolean>(true);
+  private readonly isDestAirportMissing = Subject.create(true);
+  private readonly approachQnhFormatIsHpa = Subject.create(true);
 
   /** in feet */
   private ldgRwyThresholdLocation = Subject.create<number | null>(null);
@@ -775,6 +776,7 @@ export class MfdFmsPerf extends FmsPage<MfdFmsPerfProps> {
     this.shouldShowConfirmVSpeeds();
 
     this.destAirportIdent.set(this.loadedFlightPlan.destinationAirport?.ident ?? '');
+    this.isDestAirportMissing.set(this.loadedFlightPlan.destinationAirport === undefined);
 
     let precisionApproach = false;
     if (this.loadedFlightPlan.approach) {
@@ -3076,6 +3078,7 @@ export class MfdFmsPerf extends FmsPage<MfdFmsPerfProps> {
                             errorHandler={(e) => this.props.fmcService.master.showFmsErrorMessage(e.type, e.details)}
                             hEventConsumer={this.props.mfd.hEventConsumer}
                             interactionMode={this.props.mfd.interactionMode}
+                            disabled={this.isDestAirportMissing}
                           />
                           <InputField<number, number, false>
                             dataEntryFormat={new WindSpeedFormat()}
@@ -3092,6 +3095,7 @@ export class MfdFmsPerf extends FmsPage<MfdFmsPerfProps> {
                             errorHandler={(e) => this.props.fmcService.master.showFmsErrorMessage(e.type, e.details)}
                             hEventConsumer={this.props.mfd.hEventConsumer}
                             interactionMode={this.props.mfd.interactionMode}
+                            disabled={this.isDestAirportMissing}
                           />
                         </div>
                       </div>
@@ -3125,6 +3129,7 @@ export class MfdFmsPerf extends FmsPage<MfdFmsPerfProps> {
                           errorHandler={(e) => this.props.fmcService.master.showFmsErrorMessage(e.type, e.details)}
                           hEventConsumer={this.props.mfd.hEventConsumer}
                           interactionMode={this.props.mfd.interactionMode}
+                          disabled={this.isDestAirportMissing}
                         />
                       </div>
                       <div style="display: flex; flex-direction: row; margin-top: 15px;">
@@ -3150,6 +3155,7 @@ export class MfdFmsPerf extends FmsPage<MfdFmsPerfProps> {
                           errorHandler={(e) => this.props.fmcService.master.showFmsErrorMessage(e.type, e.details)}
                           hEventConsumer={this.props.mfd.hEventConsumer}
                           interactionMode={this.props.mfd.interactionMode}
+                          disabled={this.isDestAirportMissing}
                         />
                       </div>
                     </div>
