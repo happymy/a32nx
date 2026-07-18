@@ -56,6 +56,7 @@
 1. [A380X/FLIGHT MODEL] Fix for tires sinking into runway - @donstim (donbikes)
 1. [A380X/MFD] Accept inches in QNH as 4 digits and change placeholder based on FCU setting - @BravoMike99 (bruno_pt99)
 1. [A380X/FMS] Disable destination QNH, temperature and wind fields on the PERF APPR page if no destination airport exists - @HendersonTyler
+1. [A380X/MFD] Show dashed placeholders for unset APPR and airport idents on PERF APPR page - @zain-asif-dev
 
 ## 2024.1.0
 
